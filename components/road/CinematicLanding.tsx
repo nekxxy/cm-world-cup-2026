@@ -9,10 +9,14 @@ import { FinalDestinationSection } from "./sections/FinalDestinationSection";
  * (procedural floodlit pitch + host-city beacons) followed by editorial
  * sections. Replaces the old space/globe landing for signed-out visitors.
  */
-export default function CinematicLanding() {
+export default function CinematicLanding({
+  cta,
+}: {
+  cta?: "login" | "onboarding" | null;
+}) {
   return (
     <div>
-      <RoadHeroClient />
+      <RoadHeroClient cta={cta} />
       <HostCitiesSection />
       <TournamentJourneySection />
       <FanEnergySection />

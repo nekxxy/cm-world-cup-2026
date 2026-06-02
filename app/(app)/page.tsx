@@ -17,14 +17,17 @@ export const dynamic = "force-dynamic";
 export default async function HomePage() {
   const user = await getCurrentUser();
 
+  // Auth entry point surfaced on the landing hero.
+  const cta = !user ? "login" : user.favTeamId == null ? "onboarding" : null;
+
   // Signed out, no favourites yet, or no seeded teams → the cinematic
   // "Road to 2026" arrival experience.
   if (!user || user.favTeamId == null || !hasTeamData()) {
-    return <CinematicLanding />;
+    return <CinematicLanding cta={cta} />;
   }
 
   const favTeam = getTeam(user.favTeamId);
-  if (!favTeam) return <CinematicLanding />;
+  if (!favTeam) return <CinematicLanding cta={cta} />;
   const fav2Team = getTeam(user.fav2TeamId) ?? null;
 
   // Soonest live/scheduled match across both favourites.

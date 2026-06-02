@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { MapPinned, Route, X } from "lucide-react";
+import Link from "next/link";
+import { LogIn, MapPinned, Route, X } from "lucide-react";
 import { CITIES, type City } from "@/lib/cities";
 import { detectTier, type DeviceTier } from "@/lib/deviceTier";
 import { cn } from "@/lib/cn";
@@ -15,7 +16,18 @@ import { GlobeErrorBoundary } from "@/components/Globe/GlobeErrorBoundary";
 
 const ROUTE_ACCENT = "#8aa0ff"; // cool flight-path tone
 
-export default function RoadHero() {
+export default function RoadHero({
+  cta,
+}: {
+  /** Auth entry point for the landing: login (signed out) or onboarding. */
+  cta?: "login" | "onboarding" | null;
+}) {
+  const authCta =
+    cta === "login"
+      ? { href: "/login", label: "Log in with Telegram" }
+      : cta === "onboarding"
+        ? { href: "/onboarding", label: "Pick your teams" }
+        : null;
   const [tier, setTier] = useState<DeviceTier | null>(null);
   const [mode, setMode] = useState<Mode>("day");
   const [hovered, setHovered] = useState<City | null>(null);
@@ -72,7 +84,18 @@ export default function RoadHero() {
 
       {/* Overlay content */}
       <div className="pointer-events-none relative z-20 mx-auto flex h-full max-w-5xl flex-col px-5 pb-6 pt-[calc(env(safe-area-inset-top)+5.5rem)]">
-        <div className="flex justify-end">
+        <div className="flex items-center justify-between gap-2">
+          <div className="pointer-events-auto">
+            {authCta ? (
+              <Link
+                href={authCta.href}
+                className="glass-2 inline-flex min-h-9 items-center gap-1.5 rounded-full px-3.5 text-sm font-semibold text-text transition hover:border-white/20"
+              >
+                <LogIn className="size-4 text-accent" />
+                {authCta.label}
+              </Link>
+            ) : null}
+          </div>
           <div className="pointer-events-auto">
             <MatchNightToggle mode={mode} onChange={setMode} />
           </div>

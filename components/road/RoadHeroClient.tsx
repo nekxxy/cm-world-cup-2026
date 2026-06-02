@@ -10,6 +10,10 @@ const RoadHero = dynamic(() => import("./RoadHero"), {
   ),
 });
 
-export default function RoadHeroClient() {
-  return <RoadHero />;
+export default function RoadHeroClient({
+  cta,
+}: {
+  cta?: "login" | "onboarding" | null;
+}) {
+  return <RoadHero cta={cta} />;
 }

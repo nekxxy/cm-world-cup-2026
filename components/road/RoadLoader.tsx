@@ -1,12 +1,25 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useProgress } from "@react-three/drei";
 import { cn } from "@/lib/cn";
 
-/** Loader overlay that fades out once the scene is ready. */
+/**
+ * Loader overlay shown over the hero, then faded out.
+ * The road scene is fully procedural, so `useProgress` tracks no assets
+ * (`total` stays 0). We therefore treat "no assets" as ready after a brief
+ * intro beat, while still waiting on real assets if any are ever added.
+ */
 export function RoadLoader() {
-  const { active, progress } = useProgress();
-  const done = !active && progress >= 100;
+  const { active, progress, total } = useProgress();
+  const [introDone, setIntroDone] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setIntroDone(true), 900);
+    return () => clearTimeout(t);
+  }, []);
+
+  const loaded = total === 0 ? true : !active && progress >= 100;
+  const done = introDone && loaded;
 
   return (
     <div
