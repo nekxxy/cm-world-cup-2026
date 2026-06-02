@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, MapPin, Clock, Globe2 } from "lucide-react";
-import type { Match } from "@/lib/types";
 import {
   getMatch,
   getMatches,
@@ -15,6 +14,7 @@ import Flag from "@/components/ui/Flag";
 import Pill from "@/components/ui/Pill";
 import Countdown from "@/components/ui/Countdown";
 import StatusPill from "@/components/cards/StatusPill";
+import LiveMatchScore from "@/components/LiveMatchScore";
 
 // Only seeded fixture ids exist as pages; any other id is a real 404.
 export const dynamicParams = false;
@@ -56,29 +56,6 @@ function Side({ side }: { side: ResolvedSide }) {
   );
 }
 
-function Center({ match }: { match: Match }) {
-  if (match.status === "scheduled") {
-    return (
-      <div className="px-2 text-center">
-        <div className="font-display text-3xl text-dim/50">VS</div>
-      </div>
-    );
-  }
-  return (
-    <div className="px-2 text-center">
-      <div
-        className={`font-display text-5xl leading-none tabular-nums ${
-          match.status === "live" ? "text-accent" : "text-text"
-        }`}
-      >
-        {match.homeScore ?? 0}
-        <span className="px-1 text-dim">–</span>
-        {match.awayScore ?? 0}
-      </div>
-    </div>
-  );
-}
-
 export default async function MatchPage({
   params,
 }: {
@@ -116,7 +93,18 @@ export default async function MatchPage({
       <section className="glass rounded-2xl p-5">
         <div className="flex items-start justify-between gap-2">
           <Side side={home} />
-          <Center match={match} />
+          <div className="px-2 text-center">
+            <LiveMatchScore
+              matchId={match.id}
+              kickoffUtc={match.kickoffUtc}
+              initial={{
+                status: match.status,
+                homeScore: match.homeScore,
+                awayScore: match.awayScore,
+                minute: match.minute ?? null,
+              }}
+            />
+          </div>
           <Side side={away} />
         </div>
 

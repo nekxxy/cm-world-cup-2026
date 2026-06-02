@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { Bell, Pencil, Star } from "lucide-react";
+import { Bell, Pencil, Star, Smartphone } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
 import Flag from "@/components/ui/Flag";
 import { ButtonLink } from "@/components/ui/Button";
 import NotifyToggle from "@/components/settings/NotifyToggle";
+import WebPushToggle from "@/components/settings/WebPushToggle";
 import LogoutButton from "@/components/settings/LogoutButton";
 import { getCurrentUser } from "@/lib/user";
 import { getTeam } from "@/lib/data";
@@ -84,17 +85,31 @@ export default async function SettingsPage() {
       {/* Notifications */}
       <section className="mb-8">
         <h2 className="mb-2.5 font-display text-lg tracking-wide">Notifications</h2>
-        <div className="glass flex items-center gap-3 rounded-2xl p-4">
-          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-surface2 text-accent">
-            <Bell className="size-5" />
-          </span>
-          <div className="flex-1">
-            <p className="font-semibold text-text">Kickoff reminders</p>
-            <p className="text-xs text-dim">
-              Telegram DM 30 min before &amp; at kickoff (IST)
-            </p>
+        <div className="glass space-y-4 rounded-2xl p-4">
+          <div className="flex items-center gap-3">
+            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-surface2 text-accent">
+              <Bell className="size-5" />
+            </span>
+            <div className="flex-1">
+              <p className="font-semibold text-text">Telegram reminders</p>
+              <p className="text-xs text-dim">
+                DM 30 min before &amp; at kickoff (IST)
+              </p>
+            </div>
+            <NotifyToggle initial={user.notifyEnabled} />
           </div>
-          <NotifyToggle initial={user.notifyEnabled} />
+          <div className="flex items-center gap-3 border-t border-line pt-4">
+            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-surface2 text-accent">
+              <Smartphone className="size-5" />
+            </span>
+            <div className="flex-1">
+              <p className="font-semibold text-text">Browser alerts</p>
+              <p className="text-xs text-dim">
+                Web push for this installed device
+              </p>
+            </div>
+            <WebPushToggle />
+          </div>
         </div>
       </section>
 
