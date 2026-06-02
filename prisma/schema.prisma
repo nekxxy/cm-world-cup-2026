@@ -1,0 +1,124 @@
+// WC26 Prisma schema.
+//
+// Read-path note: the app renders sports data (teams/groups/matches/venues)
+// from the committed JSON seed (data/wc2026.json) via lib/data.ts so it works
+// fully offline and on edge/serverless. These mirror models exist to satisfy
+// the spec's schema and to support optional DB-backed deployments. The User /
+// PushSubscription / SentReminder models ARE used at runtime (auth + notifs).
+//
+// Dev uses SQLite; for production swap `provider` to "postgresql" and point
+// DATABASE_URL at your Postgres instance.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ── Sports data (mirrors lib/types.ts; sourced from API-Football) ──────────
+
+model Venue {
+  id          String  @id
+  city        String
+  country     String
+  countryCode String
+  stadium     String
+  lat         Float
+  lon         Float
+  opening     Boolean @default(false)
+  final       Boolean @default(false)
+  matches     Match[]
+}
+
+model Group {
+  id      String  @id // "A".."L"
+  teams   Team[]
+  matches Match[]
+}
+
+model Team {
+  id          Int     @id // API-Football team id
+  name        String
+  code        String?
+  flagUrl     String?
+  logoUrl     String?
+  fifaRank    Int?
+  colorsJson  String? // JSON-encoded TeamColors for match-day theming
+  groupId     String?
+  group       Group?  @relation(fields: [groupId], references: [id])
+  homeMatches Match[] @relation("HomeTeam")
+  awayMatches Match[] @relation("AwayTeam")
+
+  @@index([groupId])
+}
+
+model Match {
+  id              Int      @id // API-Football fixture id
+  stage           String // group | r32 | r16 | qf | sf | 3rd | final
+  round           String?
+  groupId         String?
+  group           Group?   @relation(fields: [groupId], references: [id])
+  homeTeamId      Int?
+  awayTeamId      Int?
+  homeTeam        Team?    @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeam        Team?    @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  homePlaceholder String?
+  awayPlaceholder String?
+  venueId         String?
+  venue           Venue?   @relation(fields: [venueId], references: [id])
+  kickoffUtc      DateTime
+  status          String   @default("scheduled") // scheduled | live | finished
+  homeScore       Int?
+  awayScore       Int?
+  minute          Int?
+
+  @@index([groupId])
+  @@index([kickoffUtc])
+}
+
+// ── Users & notifications (live, DB-backed) ────────────────────────────────
+
+model User {
+  id            String   @id @default(cuid())
+  telegramId    String   @unique
+  firstName     String
+  lastName      String?
+  username      String?
+  photoUrl      String?
+  favTeamId     Int?
+  fav2TeamId    Int?
+  notifyEnabled Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  pushSubs  PushSubscription[]
+  reminders SentReminder[]
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+// Idempotency guard so each reminder fires once per user/match/kind.
+model SentReminder {
+  id      String   @id @default(cuid())
+  userId  String
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  matchId Int
+  kind    String // "t30" | "kickoff"
+  sentAt  DateTime @default(now())
+
+  @@unique([userId, matchId, kind])
+  @@index([userId])
+}
