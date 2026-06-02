@@ -1,22 +1,48 @@
-import { Globe2 } from "lucide-react";
-import PageHeader from "@/components/ui/PageHeader";
-import EmptyState from "@/components/ui/EmptyState";
+import GlobeClient from "@/components/Globe/GlobeClient";
+import type { VenueMeta } from "@/components/Globe/VenueHUD";
+import ThemeAccent from "@/components/ThemeAccent";
+import { getVenues, getMatchesByVenue, getMatchesForTeam } from "@/lib/data";
+import { getCurrentUser } from "@/lib/user";
+import { getActiveFavTheme } from "@/lib/matchday";
 
 export const metadata = { title: "Globe" };
+export const dynamic = "force-dynamic";
 
-export default function GlobePage() {
+export default async function GlobePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ venue?: string }>;
+}) {
+  const { venue } = await searchParams;
+  const venues = getVenues();
+
+  const venueMeta: Record<string, VenueMeta> = {};
+  for (const v of venues) {
+    const ms = getMatchesByVenue(v.id);
+    venueMeta[v.id] = { count: ms.length, firstMatchId: ms[0]?.id ?? null };
+  }
+
+  const user = await getCurrentUser();
+
+  // Focus: explicit ?venue, else the favourite team's first-match venue.
+  let initialFocusId =
+    venue && venues.some((v) => v.id === venue) ? venue : null;
+  if (!initialFocusId && user?.favTeamId != null) {
+    initialFocusId = getMatchesForTeam(user.favTeamId)[0]?.venueId ?? null;
+  }
+
+  // Match-day → retint the globe + overlays to the favourite team's colour.
+  const accentOverride = getActiveFavTheme(user)?.color ?? null;
+
   return (
-    <div className="rise-in">
-      <PageHeader
-        kicker="16 host cities"
-        title="The Globe"
-        subtitle="Spin a realistic Earth and explore every venue."
+    <>
+      {accentOverride ? <ThemeAccent color={accentOverride} /> : null}
+      <GlobeClient
+        venues={venues}
+        venueMeta={venueMeta}
+        initialFocusId={initialFocusId}
+        accentOverride={accentOverride}
       />
-      <EmptyState
-        Icon={Globe2}
-        title="Globe coming online"
-        description="The interactive 3D globe — host-city pins, glowing arcs and fly-to — lands in a later build phase."
-      />
-    </div>
+    </>
   );
 }

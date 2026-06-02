@@ -86,10 +86,10 @@ See [`.env.example`](./.env.example) for the full list.
 This is built in the verifiable phases from the spec:
 
 - [x] **1. Scaffold** — Next 15 + TS + Tailwind v4, design system, bottom nav, dark theme, fonts
-- [ ] **2. Data** — Prisma schema, seed, IST helper, 2D schedule/teams/match pages
+- [x] **2. Data** — Prisma schema, seed, IST helper, 2D schedule/teams/match pages
+- [x] **5. Globe** — realistic R3F Earth (day/night terminator, clouds, atmosphere, bloom), 16 host pins, arcs, fly-to, device-tier gating + 2D fallback _(prioritised as the showpiece)_
 - [ ] **3. Auth** — Telegram login + server verification + JWT session
 - [ ] **4. Onboarding** — two-favourite flow + settings
-- [ ] **5. Globe** — realistic R3F Earth + pins + arcs + fly-to + 2D fallback
 - [ ] **6. Personalisation** — favourites hub, next-match hero, match-day theming
 - [ ] **7. Live + notifications** — live layer, Telegram reminders, `.ics` export
 - [ ] **8. PWA + polish** — manifest, SW, offline, Lighthouse, a11y
