@@ -10,10 +10,15 @@ export const runtime = "nodejs";
 const MIN = 60_000;
 
 /**
- * Kickoff reminders. Intended to run every ~5 minutes (see vercel.json).
- * Fires a "30 min before" and a "kickoff" DM per favourite match, once each
- * (idempotency via the SentReminder unique constraint). Protected by
- * CRON_SECRET (Vercel Cron sends it as a Bearer token).
+ * Kickoff reminders. Fires a "30 min before" and a "kickoff" DM per favourite
+ * match, once each (idempotency via the SentReminder unique constraint).
+ * Protected by CRON_SECRET (Vercel Cron sends it as a Bearer token).
+ *
+ * SCHEDULE: the 30-min and kickoff windows below assume this runs every ~5
+ * minutes. Vercel's Hobby plan only allows daily crons, so vercel.json is
+ * pinned to "0 0 * * *" — at which cadence these reminders won't meaningfully
+ * fire. After upgrading to Pro, restore the every-5-minutes cron in vercel.json
+ * (the exact expression is in the README); the handler needs no changes.
  */
 function authorized(req: Request): boolean {
   const secret = process.env.CRON_SECRET;

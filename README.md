@@ -104,7 +104,8 @@ This is built in the verifiable phases from the spec:
 1. **Database** — set `DATABASE_URL` to Postgres and change `prisma/schema.prisma` `datasource` provider to `postgresql`, then `prisma migrate deploy` (or `prisma db push`).
 2. **Seed** — run `npm run seed` with `API_FOOTBALL_KEY` and commit the refreshed `data/wc2026.json`.
 3. **Telegram** — `BOT_TOKEN`, `NEXT_PUBLIC_BOT_USERNAME`, `JWT_SECRET`; `/setdomain` to the deployed URL.
-4. **Reminders cron** — `vercel.json` runs `/api/cron/reminders` every 5 min; set `CRON_SECRET` (Vercel sends it as a Bearer token).
+4. **Reminders cron** — `vercel.json` runs `/api/cron/reminders`; set `CRON_SECRET` (Vercel sends it as a Bearer token).
+   - **Hobby plan** only allows **daily** crons, so the schedule is pinned to `0 0 * * *`. The reminder windows (30-min/kickoff) need a frequent cron to fire, so on **Pro** restore the intended **every-5-minutes** schedule `*/5 * * * *` in `vercel.json`.
 5. **Web Push** — set the VAPID keys. `USE_LIVE=true` enables the live-score layer.
 
 ---
