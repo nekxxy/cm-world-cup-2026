@@ -1,0 +1,220 @@
+@import "tailwindcss";
+
+/* ───────────────────────────────────────────────────────────
+   Design tokens — "space + broadcast" cinematic dark system.
+   Accent vars are intentionally runtime-swappable so match-day
+   mode can retint the whole UI (and the globe) to a team's colours.
+   ─────────────────────────────────────────────────────────── */
+:root {
+  /* Base surfaces */
+  --bg: #05060b;
+  --bg-2: #0a0c16;
+  --surface: rgba(255, 255, 255, 0.045);
+  --surface-2: rgba(255, 255, 255, 0.08);
+  --line: rgba(255, 255, 255, 0.1);
+
+  /* Text */
+  --text: #eef1f7;
+  --dim: #98a2b3;
+
+  /* Accent — default brand (electric teal). Swapped per favourite team. */
+  --accent: #19e3c6;
+  --accent-2: #3b82f6;
+  --accent-rgb: 25, 227, 198;
+
+  /* Status */
+  --live: #ff3b5c;
+  --warn: #ffc24b;
+  --gold: #f4c04e;
+
+  color-scheme: dark;
+}
+
+/* Map design tokens to Tailwind utilities. `inline` keeps the var
+   reference in the emitted utility so runtime overrides take effect. */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg2: var(--bg-2);
+  --color-surface: var(--surface);
+  --color-surface2: var(--surface-2);
+  --color-line: var(--line);
+  --color-text: var(--text);
+  --color-dim: var(--dim);
+  --color-accent: var(--accent);
+  --color-accent2: var(--accent-2);
+  --color-live: var(--live);
+  --color-warn: var(--warn);
+  --color-gold: var(--gold);
+
+  --font-display: var(--font-anton), "Arial Narrow", system-ui, sans-serif;
+  --font-body: var(--font-hanken), system-ui, sans-serif;
+
+  --radius-xl2: 1.375rem;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100dvh;
+  color: var(--text);
+  font-family: var(--font-body);
+  background:
+    radial-gradient(1200px 760px at 82% -12%, rgba(59, 130, 246, 0.12), transparent 60%),
+    radial-gradient(900px 700px at 6% 112%, rgba(var(--accent-rgb), 0.1), transparent 58%),
+    var(--bg);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Display face: tighten for that jersey-number, broadcast energy. */
+.font-display,
+[class*="font-display"] {
+  letter-spacing: 0.01em;
+}
+
+/* ── Reusable utilities ─────────────────────────────────────── */
+
+/* Glassy card that floats over the 3D canvas / space backdrop. */
+@utility glass {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.04) inset,
+    0 24px 60px -28px rgba(0, 0, 0, 0.7);
+}
+
+@utility glass-2 {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  backdrop-filter: blur(14px) saturate(1.2);
+}
+
+/* Accent-tinted gradient text for headline numbers. */
+@utility text-grad {
+  background: linear-gradient(100deg, var(--text) 0%, var(--accent) 120%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility accent-glow {
+  box-shadow: 0 0 0 1px rgba(var(--accent-rgb), 0.4),
+    0 0 28px -4px rgba(var(--accent-rgb), 0.55);
+}
+
+/* Safe-area helpers for notched phones. */
+@utility pb-safe {
+  padding-bottom: calc(env(safe-area-inset-bottom) + var(--pb, 0px));
+}
+@utility pt-safe {
+  padding-top: calc(env(safe-area-inset-top) + var(--pt, 0px));
+}
+
+/* A cheap, GPU-light starfield (no image) for the landing. */
+@utility starfield {
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(1px 1px at 75% 18%, rgba(255, 255, 255, 0.55), transparent),
+    radial-gradient(1.5px 1.5px at 50% 60%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 12% 80%, rgba(255, 255, 255, 0.45), transparent),
+    radial-gradient(1px 1px at 90% 70%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1.5px 1.5px at 65% 88%, rgba(255, 255, 255, 0.4), transparent);
+  background-repeat: repeat;
+  background-size: 320px 320px;
+}
+
+/* Custom scrollbar for the dark theme. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 9999px;
+}
+
+/* Hide scrollbar where we want clean horizontal scrollers. */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Live pulse for in-progress matches. */
+@keyframes live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.7);
+  }
+}
+.live-dot {
+  animation: live-pulse 1.4s ease-in-out infinite;
+}
+
+/* Staggered entrance used by the HUD reveal. */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.rise-in {
+  animation: rise-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.07),
+    transparent
+  );
+  animation: shimmer 1.6s infinite;
+}
+
+/* Respect users who prefer reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
