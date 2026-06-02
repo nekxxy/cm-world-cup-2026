@@ -8,7 +8,7 @@ import {
 } from "@/lib/data";
 import { istDayKey, istTodayKey } from "@/lib/ist";
 import { getActiveFavTheme } from "@/lib/matchday";
-import Landing from "@/components/home/Landing";
+import CinematicLanding from "@/components/road/CinematicLanding";
 import FavouritesHub from "@/components/home/FavouritesHub";
 import ThemeAccent from "@/components/ThemeAccent";
 
@@ -17,13 +17,14 @@ export const dynamic = "force-dynamic";
 export default async function HomePage() {
   const user = await getCurrentUser();
 
-  // Signed out, no favourites yet, or no seeded teams → the landing hero.
+  // Signed out, no favourites yet, or no seeded teams → the cinematic
+  // "Road to 2026" arrival experience.
   if (!user || user.favTeamId == null || !hasTeamData()) {
-    return <Landing loggedIn={Boolean(user)} />;
+    return <CinematicLanding />;
   }
 
   const favTeam = getTeam(user.favTeamId);
-  if (!favTeam) return <Landing loggedIn />;
+  if (!favTeam) return <CinematicLanding />;
   const fav2Team = getTeam(user.fav2TeamId) ?? null;
 
   // Soonest live/scheduled match across both favourites.
