@@ -122,3 +122,8 @@ model SentReminder {
   @@unique([userId, matchId, kind])
   @@index([userId])
 }
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
