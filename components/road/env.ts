@@ -1,62 +1,60 @@
-/** Scene constants + day / match-night palettes for the Road to 2026 hero. */
+/** Scene constants + studio "golden" / "spotlight" palettes for the match-ball hero. */
 
 export type Mode = "day" | "night";
 
 export interface Palette {
-  sky: string;
-  key: string; // sun / moon colour
+  bg: string;
+  key: string; // key light colour
   keyIntensity: number;
   keyPos: [number, number, number];
+  rim: string; // rim/back light colour
+  rimIntensity: number;
   ambient: number;
-  hemi: number;
   fog: string;
   fogDensity: number;
-  grass: string;
-  grassDark: string;
+  floor: string;
+  sparkle: string;
   bloom: number;
-  beam: number; // floodlight beam opacity
 }
 
 export const PALETTES: Record<Mode, Palette> = {
-  // Golden hour — warm, soft, arriving in the afternoon.
+  // Golden studio — warm, premium, inviting.
   day: {
-    sky: "#243049",
-    key: "#ffd6a0",
-    keyIntensity: 2.6,
-    keyPos: [9, 7, 6],
-    ambient: 0.55,
-    hemi: 0.7,
-    fog: "#1a2538",
-    fogDensity: 0.03,
-    grass: "#37a866",
-    grassDark: "#236c46",
-    bloom: 0.7,
-    beam: 0.04,
+    bg: "#11131d",
+    key: "#ffe6b8",
+    keyIntensity: 3.1,
+    keyPos: [5, 6, 4],
+    rim: "#7fa0ff",
+    rimIntensity: 1.1,
+    ambient: 0.5,
+    fog: "#11131d",
+    fogDensity: 0.018,
+    floor: "#0c0f18",
+    sparkle: "#ffd98a",
+    bloom: 0.6,
   },
-  // Match night — deep navy, floodlights dominate, beams cut the haze.
+  // Spotlight night — dramatic, cinematic, floodlit.
   night: {
-    sky: "#070b14",
-    key: "#c3d4ff",
-    keyIntensity: 0.9,
-    keyPos: [6, 10, -3],
-    ambient: 0.2,
-    hemi: 0.28,
-    fog: "#070b14",
-    fogDensity: 0.055,
-    grass: "#1c4d36",
-    grassDark: "#0f3024",
+    bg: "#05070e",
+    key: "#d6e3ff",
+    keyIntensity: 2.3,
+    keyPos: [4, 7, 3],
+    rim: "#9a7bff",
+    rimIntensity: 1.7,
+    ambient: 0.22,
+    fog: "#05070e",
+    fogDensity: 0.032,
+    floor: "#05070e",
+    sparkle: "#ffd98a",
     bloom: 1.15,
-    beam: 0.16,
   },
 };
 
 export const CAMERA = {
-  position: [0, 6.4, 16.5] as [number, number, number],
-  fov: 40,
-  target: [0, 0.6, -1.5] as [number, number, number],
+  position: [0, 0.6, 6.2] as [number, number, number],
+  fov: 38,
+  target: [0, 0.1, 0] as [number, number, number],
 };
-
-export const GROUND = { width: 66, depth: 46 };
 
 export const GOLD = "#e9b24c";
 export const FLOOD = "#fff6e0";

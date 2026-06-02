@@ -2,24 +2,20 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import type { City } from "@/lib/cities";
-import { CAMERA, type Mode, type Palette } from "./env";
+import { CAMERA, type Palette } from "./env";
 import { RoadScene } from "./RoadScene";
 
-export function RoadCanvas(props: {
-  cities: City[];
+export function RoadCanvas({
+  palette,
+  effects,
+  reflectiveFloor,
+  maxDpr,
+}: {
   palette: Palette;
-  mode: Mode;
-  activeId: string | null;
-  selected: City | null;
   effects: boolean;
-  crowdDensity: number;
-  accent: string;
+  reflectiveFloor: boolean;
   maxDpr: number;
-  onHover: (c: City | null) => void;
-  onSelect: (c: City) => void;
 }) {
-  const { maxDpr, ...scene } = props;
   const [hidden, setHidden] = useState(false);
   useEffect(() => {
     const onVis = () => setHidden(document.hidden);
@@ -30,12 +26,18 @@ export function RoadCanvas(props: {
   return (
     <Canvas
       dpr={[1, maxDpr]}
-      camera={{ position: CAMERA.position, fov: CAMERA.fov, near: 0.1, far: 120 }}
+      camera={{ position: CAMERA.position, fov: CAMERA.fov, near: 0.1, far: 100 }}
       frameloop={hidden ? "never" : "always"}
       gl={{ antialias: true, powerPreference: "high-performance" }}
+      // Vertical gestures scroll the page; horizontal gestures spin the ball.
+      style={{ touchAction: "pan-y" }}
     >
       <Suspense fallback={null}>
-        <RoadScene {...scene} />
+        <RoadScene
+          palette={palette}
+          effects={effects}
+          reflectiveFloor={reflectiveFloor}
+        />
       </Suspense>
     </Canvas>
   );

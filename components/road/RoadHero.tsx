@@ -2,19 +2,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { LogIn, MapPinned, Route, X } from "lucide-react";
-import { CITIES, type City } from "@/lib/cities";
+import { LogIn, MapPinned, Route } from "lucide-react";
 import { detectTier, type DeviceTier } from "@/lib/deviceTier";
-import { cn } from "@/lib/cn";
 import { PALETTES, type Mode } from "./env";
 import { RoadCanvas } from "./RoadCanvas";
 import { RoadLoader } from "./RoadLoader";
 import { Road2DFallback } from "./Road2DFallback";
-import { CityInfoCard } from "./CityInfoCard";
 import { MatchNightToggle } from "./MatchNightToggle";
 import { GlobeErrorBoundary } from "@/components/Globe/GlobeErrorBoundary";
-
-const ROUTE_ACCENT = "#8aa0ff"; // cool flight-path tone
 
 export default function RoadHero({
   cta,
@@ -28,20 +23,19 @@ export default function RoadHero({
       : cta === "onboarding"
         ? { href: "/onboarding", label: "Pick your teams" }
         : null;
+
   const [tier, setTier] = useState<DeviceTier | null>(null);
   const [mode, setMode] = useState<Mode>("day");
-  const [hovered, setHovered] = useState<City | null>(null);
-  const [selected, setSelected] = useState<City | null>(null);
 
   useEffect(() => {
     setTier(detectTier());
   }, []);
 
   const palette = PALETTES[mode];
-  const card = hovered ?? selected;
   const settings = useMemo(() => {
-    if (tier === "high") return { effects: true, maxDpr: 2, crowd: 1 };
-    return { effects: false, maxDpr: 1.25, crowd: 0.5 };
+    if (tier === "high")
+      return { effects: true, maxDpr: 2, reflectiveFloor: true };
+    return { effects: false, maxDpr: 1.25, reflectiveFloor: false };
   }, [tier]);
 
   return (
@@ -55,17 +49,10 @@ export default function RoadHero({
         ) : (
           <GlobeErrorBoundary fallback={<Road2DFallback mode={mode} />}>
             <RoadCanvas
-              cities={CITIES}
               palette={palette}
-              mode={mode}
-              activeId={selected?.id ?? null}
-              selected={selected}
               effects={settings.effects}
-              crowdDensity={settings.crowd}
-              accent={ROUTE_ACCENT}
+              reflectiveFloor={settings.reflectiveFloor}
               maxDpr={settings.maxDpr}
-              onHover={setHovered}
-              onSelect={setSelected}
             />
             <RoadLoader />
           </GlobeErrorBoundary>
@@ -77,13 +64,13 @@ export default function RoadHero({
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "linear-gradient(180deg, rgba(7,10,18,0.55) 0%, transparent 28%, transparent 52%, rgba(7,10,18,0.86) 100%)",
+            "linear-gradient(180deg, rgba(7,10,18,0.5) 0%, transparent 30%, transparent 50%, rgba(7,10,18,0.85) 100%)",
         }}
       />
       <div className="pointer-events-none absolute inset-0 grain opacity-[0.04]" />
 
       {/* Overlay content */}
-      <div className="pointer-events-none relative z-20 mx-auto flex h-full max-w-5xl flex-col px-5 pb-6 pt-[calc(env(safe-area-inset-top)+5.5rem)]">
+      <div className="pointer-events-none relative z-20 mx-auto flex h-full max-w-5xl flex-col px-5 pb-7 pt-[calc(env(safe-area-inset-top)+5.5rem)]">
         <div className="flex items-center justify-between gap-2">
           <div className="pointer-events-auto">
             {authCta ? (
@@ -131,63 +118,19 @@ export default function RoadHero({
           </div>
         </div>
 
-        {/* City selector / route timeline */}
-        <div className="pointer-events-auto mt-6">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-dim">
-              Host cities
-            </span>
-            {selected ? (
-              <button
-                onClick={() => setSelected(null)}
-                className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-accent"
-              >
-                <X className="size-3" /> Overview
-              </button>
-            ) : null}
-          </div>
-          <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
-            {CITIES.map((c) => {
-              const active = selected?.id === c.id;
-              return (
-                <button
-                  key={c.id}
-                  onClick={() => setSelected(active ? null : c)}
-                  onMouseEnter={() => setHovered(c)}
-                  onMouseLeave={() => setHovered(null)}
-                  className={cn(
-                    "flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition",
-                    active
-                      ? "border-accent/50 bg-accent/15 text-accent"
-                      : "border-white/10 bg-white/5 text-dim hover:text-text",
-                  )}
-                >
-                  <span
-                    className="size-1.5 rounded-full"
-                    style={{ background: c.nationColor }}
-                  />
-                  {c.city}
-                </button>
-              );
-            })}
-          </div>
+        {/* Interaction hint */}
+        <div className="mt-7 flex items-center justify-between gap-3">
+          <span className="glass rounded-full px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-dim">
+            Drag to spin · tap to kick
+          </span>
+          <a
+            href="#host-cities"
+            className="pointer-events-auto text-[11px] font-semibold uppercase tracking-[0.2em] text-dim/70 hover:text-text"
+          >
+            Scroll ↓
+          </a>
         </div>
       </div>
-
-      {/* Floating glass info card */}
-      {card ? (
-        <div className="pointer-events-auto absolute bottom-32 left-5 z-30 hidden rise-in sm:block">
-          <CityInfoCard city={card} />
-        </div>
-      ) : null}
-
-      {/* Scroll cue */}
-      <a
-        href="#host-cities"
-        className="pointer-events-auto absolute bottom-3 left-1/2 z-20 -translate-x-1/2 text-[11px] font-semibold uppercase tracking-[0.2em] text-dim/70 hover:text-text"
-      >
-        Scroll ↓
-      </a>
     </section>
   );
 }
