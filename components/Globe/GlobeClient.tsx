@@ -19,6 +19,7 @@ export default function GlobeClient(props: {
   venues: Venue[];
   venueMeta: Record<string, VenueMeta>;
   initialFocusId: string | null;
+  accentOverride?: string | null;
 }) {
   return <GlobeExperience {...props} />;
 }

@@ -19,10 +19,13 @@ export default function GlobeExperience({
   venues,
   venueMeta,
   initialFocusId,
+  accentOverride,
 }: {
   venues: Venue[];
   venueMeta: Record<string, VenueMeta>;
   initialFocusId: string | null;
+  /** Match-day accent for a favourite team (overrides the brand --accent). */
+  accentOverride?: string | null;
 }) {
   const opening = useMemo(
     () => venues.find((v) => v.opening) ?? venues[0],
@@ -35,7 +38,7 @@ export default function GlobeExperience({
 
   const [tier, setTier] = useState<DeviceTier | null>(null);
   const [reduced, setReduced] = useState(false);
-  const [accent, setAccent] = useState("#19e3c6");
+  const [accent, setAccent] = useState(accentOverride ?? "#19e3c6");
   const [selected, setSelected] = useState<Venue | null>(initialVenue ?? null);
   const [hovered, setHovered] = useState<Venue | null>(null);
   const [focusPos, setFocusPos] = useState<[number, number, number] | null>(
@@ -45,14 +48,16 @@ export default function GlobeExperience({
   useEffect(() => {
     setTier(detectTier());
     setReduced(prefersReducedMotion());
-    const a = getComputedStyle(document.documentElement)
-      .getPropertyValue("--accent")
-      .trim();
-    if (a) setAccent(a);
+    if (!accentOverride) {
+      const a = getComputedStyle(document.documentElement)
+        .getPropertyValue("--accent")
+        .trim();
+      if (a) setAccent(a);
+    }
     // Initial camera focus: requested venue, else the opening venue.
     const first = initialVenue ?? opening;
     if (first) setFocusPos(pos(first));
-  }, [initialVenue, opening]);
+  }, [initialVenue, opening, accentOverride]);
 
   const handleSelect = (v: Venue) => {
     setSelected(v);
