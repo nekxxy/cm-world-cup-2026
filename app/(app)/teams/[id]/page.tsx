@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, Bell, Trophy } from "lucide-react";
+import { ChevronLeft, Bell, Trophy, CalendarPlus } from "lucide-react";
 import { getTeam, getTeams, getStandings, getMatchesForTeam } from "@/lib/data";
 import { formatKickoffIST } from "@/lib/ist";
 import Flag from "@/components/ui/Flag";
@@ -69,10 +69,21 @@ export default async function TeamPage({
         </div>
       </header>
 
-      <ButtonLink href="/login" variant="glass" className="mb-6 w-full">
-        <Bell className="size-4 text-accent" />
-        Log in to follow {team.code ?? team.name} & get reminders
-      </ButtonLink>
+      <div className="mb-6 grid grid-cols-1 gap-2.5">
+        <ButtonLink href="/login" variant="glass" className="w-full">
+          <Bell className="size-4 text-accent" />
+          Log in to follow {team.code ?? team.name} & get reminders
+        </ButtonLink>
+        {matches.length > 0 ? (
+          <a
+            href={`/api/ics/${team.id}`}
+            className="glass-2 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold text-text transition hover:border-white/20"
+          >
+            <CalendarPlus className="size-4 text-accent" />
+            Add fixtures to calendar (.ics)
+          </a>
+        ) : null}
+      </div>
 
       {/* Next match */}
       {nextMatch ? (

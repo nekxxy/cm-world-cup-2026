@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Anton, Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
+import RegisterSW from "@/components/pwa/RegisterSW";
 
 /* Display: Anton — jersey-number, broadcast energy for headlines & scores. */
 const anton = Anton({
@@ -81,7 +82,10 @@ export default function RootLayout({
       lang="en"
       className={`${anton.variable} ${hanken.variable} h-full`}
     >
-      <body className="min-h-dvh font-body antialiased">{children}</body>
+      <body className="min-h-dvh font-body antialiased">
+        {children}
+        <RegisterSW />
+      </body>
     </html>
   );
 }

@@ -87,12 +87,25 @@ This is built in the verifiable phases from the spec:
 
 - [x] **1. Scaffold** — Next 15 + TS + Tailwind v4, design system, bottom nav, dark theme, fonts
 - [x] **2. Data** — Prisma schema, seed, IST helper, 2D schedule/teams/match pages
-- [x] **5. Globe** — realistic R3F Earth (day/night terminator, clouds, atmosphere, bloom), 16 host pins, arcs, fly-to, device-tier gating + 2D fallback _(prioritised as the showpiece)_
-- [ ] **3. Auth** — Telegram login + server verification + JWT session
-- [ ] **4. Onboarding** — two-favourite flow + settings
-- [ ] **6. Personalisation** — favourites hub, next-match hero, match-day theming
-- [ ] **7. Live + notifications** — live layer, Telegram reminders, `.ics` export
-- [ ] **8. PWA + polish** — manifest, SW, offline, Lighthouse, a11y
+- [x] **3. Auth** — Telegram login + server verification + JWT session + middleware
+- [x] **4. Onboarding** — two-favourite flow + settings edit
+- [x] **5. Globe** — realistic R3F Earth (day/night terminator, clouds, atmosphere, bloom), 16 host pins, arcs, fly-to, device-tier gating + 2D fallback _(the showpiece)_
+- [x] **6. Personalisation** — favourites hub, next-match hero, match-day theming, globe focus
+- [x] **7. Live + notifications** — cached live layer, Telegram reminders cron, Web Push, `.ics` export
+- [x] **8. PWA + polish** — manifest, icons, service worker (offline + push), OG image
+
+> Verified locally via `tsc` + `next build` + route smoke tests + unit checks (IST, ICS).
+> The WebGL globe render and Lighthouse scores need a real browser/deploy (this
+> build env has no GPU and blocks the texture CDN). Seeded team/fixture views and
+> Telegram/Push flows need their respective keys to light up (keyless-safe).
+
+## Production (Vercel)
+
+1. **Database** — set `DATABASE_URL` to Postgres and change `prisma/schema.prisma` `datasource` provider to `postgresql`, then `prisma migrate deploy` (or `prisma db push`).
+2. **Seed** — run `npm run seed` with `API_FOOTBALL_KEY` and commit the refreshed `data/wc2026.json`.
+3. **Telegram** — `BOT_TOKEN`, `NEXT_PUBLIC_BOT_USERNAME`, `JWT_SECRET`; `/setdomain` to the deployed URL.
+4. **Reminders cron** — `vercel.json` runs `/api/cron/reminders` every 5 min; set `CRON_SECRET` (Vercel sends it as a Bearer token).
+5. **Web Push** — set the VAPID keys. `USE_LIVE=true` enables the live-score layer.
 
 ---
 
