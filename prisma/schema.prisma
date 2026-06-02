@@ -6,16 +6,18 @@
 // the spec's schema and to support optional DB-backed deployments. The User /
 // PushSubscription / SentReminder models ARE used at runtime (auth + notifs).
 //
-// Dev uses SQLite; for production swap `provider` to "postgresql" and point
-// DATABASE_URL at your Postgres instance.
+// Postgres (Neon) in production via Vercel. DATABASE_URL is the pooled
+// connection used at runtime; directUrl (DATABASE_URL_UNPOOLED) is the direct
+// connection Prisma uses for migrations / `db push`.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
 // ── Sports data (mirrors lib/types.ts; sourced from API-Football) ──────────
