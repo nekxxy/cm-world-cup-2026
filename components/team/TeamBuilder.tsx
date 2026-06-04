@@ -14,6 +14,7 @@ import {
 import { currentRound } from "@/lib/rounds";
 import { tgFetch } from "@/telegram/api";
 import { hapticImpact, hapticSelection, hapticNotify } from "@/telegram/haptics";
+import { useMainButton } from "@/telegram/useTelegramUI";
 import TeamCrest from "@/components/TeamCrest";
 import Pitch from "./Pitch";
 
@@ -147,10 +148,19 @@ export default function TeamBuilder({ team, onBack }: { team: Team; onBack: () =
     }
   }
 
+  // Native Telegram MainButton mirrors the in-page Save (fallback for browser).
+  useMainButton({
+    text: locked ? "Locked" : saving ? "Saving…" : "Save XI",
+    visible: !locked,
+    active: validation.ok && !saving,
+    progress: saving,
+    onClick: save,
+  });
+
   const deadline = new Date(round.deadline);
 
   return (
-    <main style={{ minHeight: "100dvh", paddingBottom: 96 }}>
+    <main style={{ minHeight: "100dvh", paddingBottom: 168 }}>
       <div style={S.inner}>
         <div style={S.topbar}>
           <button onClick={() => { hapticImpact("light"); onBack(); }} style={S.back}>← Back</button>
@@ -279,7 +289,7 @@ const S: Record<string, React.CSSProperties> = {
   poolRow: { display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "10px 12px", borderRadius: 12, background: "var(--color-panel)", color: "var(--color-text)", border: "1px solid var(--color-hairline)", cursor: "pointer" },
   poolRowOn: { border: "2px solid var(--color-accent)" },
   addMark: { minWidth: 34, textAlign: "right", fontSize: 12, fontWeight: 800, color: "var(--color-accent)" },
-  dock: { position: "fixed", left: 0, right: 0, bottom: 0, padding: "10px 16px calc(10px + var(--safe-bottom))", background: "color-mix(in srgb, var(--color-bg) 88%, transparent)", backdropFilter: "blur(8px)", borderTop: "1px solid var(--color-hairline)" },
+  dock: { position: "fixed", left: 0, right: 0, bottom: "calc(64px + var(--safe-bottom))", zIndex: 40, padding: "10px 16px", background: "color-mix(in srgb, var(--color-bg) 92%, transparent)", backdropFilter: "blur(8px)", borderTop: "1px solid var(--color-hairline)" },
   dockRow: { maxWidth: 480, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, fontSize: 14 },
   save: { padding: "11px 22px", borderRadius: 999, background: "var(--color-primary)", color: "var(--color-on-primary)", border: "none", fontWeight: 800, fontSize: 15, cursor: "pointer" },
   statusBar: { maxWidth: 480, margin: "8px auto 0", fontSize: 13, color: "var(--color-muted)", textAlign: "center" },

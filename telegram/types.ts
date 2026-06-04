@@ -59,6 +59,31 @@ export interface TelegramDeviceOrientation {
   stop: (cb?: () => void) => void;
 }
 
+export interface TelegramBackButton {
+  isVisible: boolean;
+  show: () => void;
+  hide: () => void;
+  onClick: (cb: () => void) => void;
+  offClick: (cb: () => void) => void;
+}
+
+export interface TelegramMainButton {
+  text: string;
+  isVisible: boolean;
+  isActive: boolean;
+  isProgressVisible: boolean;
+  show: () => void;
+  hide: () => void;
+  enable: () => void;
+  disable: () => void;
+  showProgress: (leaveActive?: boolean) => void;
+  hideProgress: () => void;
+  setText: (text: string) => void;
+  setParams: (params: { text?: string; color?: string; text_color?: string; is_active?: boolean; is_visible?: boolean }) => void;
+  onClick: (cb: () => void) => void;
+  offClick: (cb: () => void) => void;
+}
+
 export interface TelegramWebApp {
   initData: string;
   initDataUnsafe: {
@@ -78,6 +103,8 @@ export interface TelegramWebApp {
   CloudStorage?: TelegramCloudStorage;
   HapticFeedback?: TelegramHapticFeedback;
   DeviceOrientation?: TelegramDeviceOrientation;
+  BackButton?: TelegramBackButton;
+  MainButton?: TelegramMainButton;
 
   ready: () => void;
   expand: () => void;
