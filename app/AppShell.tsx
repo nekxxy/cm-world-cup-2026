@@ -7,7 +7,7 @@ import { useTeamTheme } from "@/theme/useTeamTheme";
 import { cloudGet, cloudSet } from "@/telegram/cloudStorage";
 import { hapticImpact, hapticSelection } from "@/telegram/haptics";
 import TeamSelector from "@/components/TeamSelector";
-import ThemedHome from "@/components/ThemedHome";
+import ScrollExperience from "@/components/experience/ScrollExperience";
 
 const TEAM_KEY = "wc26_team";
 
@@ -69,7 +69,7 @@ export default function AppShell() {
     return <TeamSelector currentTeamId={teamId} onSelect={handleSelect} />;
   }
 
-  return <ThemedHome team={team} user={user} onChangeTeam={handleChangeTeam} />;
+  return <ScrollExperience team={team} user={user} onChangeTeam={handleChangeTeam} />;
 }
 
 const center: React.CSSProperties = {

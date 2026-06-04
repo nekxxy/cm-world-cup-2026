@@ -6,15 +6,13 @@ import { useTelegram } from "@/telegram/useTelegram";
 import { useNearViewport } from "./scroll/useNearViewport";
 import HeroPoster from "./HeroPoster";
 
-// Client-only: the 3D scene must never be server-rendered.
-const HeroBallScene = dynamic(() => import("./HeroBallScene"), {
+// Client-only, and only imported once the section nears the viewport.
+const TrophyScene = dynamic(() => import("./TrophyScene"), {
   ssr: false,
-  loading: () => null, // poster underneath shows until the chunk + WebGL are up
+  loading: () => null,
 });
 
-const HEIGHT = 300;
-
-export default function HeroBall({
+export default function Trophy({
   primary,
   secondary,
 }: {
@@ -23,12 +21,10 @@ export default function HeroBall({
 }) {
   const { performanceClass } = useTelegram();
   const [reducedMotion, setReducedMotion] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const near = useNearViewport(ref);
 
   useEffect(() => {
-    setMounted(true);
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     const update = () => setReducedMotion(mq.matches);
     update();
@@ -36,7 +32,6 @@ export default function HeroBall({
     return () => mq.removeEventListener("change", update);
   }, []);
 
-  // Flat hero on weak devices or when the user asked for less motion.
   const flatOnly = performanceClass === "LOW" || reducedMotion;
 
   return (
@@ -44,20 +39,16 @@ export default function HeroBall({
       ref={ref}
       style={{
         position: "relative",
-        height: HEIGHT,
-        borderRadius: 16,
-        overflow: "hidden",
-        border: "1px solid var(--color-hairline)",
-        background: "var(--color-panel)",
+        width: "100%",
+        height: 320,
+        maxWidth: 360,
       }}
     >
-      {/* Poster always painted first; the canvas (transparent) covers it once
-          the ball is drawing, so there's never a blank flash. */}
       <HeroPoster primary={primary} secondary={secondary} />
-
-      {mounted && !flatOnly && near && (
+      {/* Mount only while near; unmounting tears the GL context down. */}
+      {!flatOnly && near && (
         <div style={{ position: "absolute", inset: 0 }}>
-          <HeroBallScene primary={primary} secondary={secondary} />
+          <TrophyScene primary={primary} secondary={secondary} />
         </div>
       )}
     </div>
