@@ -1,5 +1,5 @@
-import Hello from "./Hello";
+import AppShell from "./AppShell";
 
 export default function Page() {
-  return <Hello />;
+  return <AppShell />;
 }

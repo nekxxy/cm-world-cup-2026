@@ -29,6 +29,22 @@ export interface TelegramThemeParams {
   destructive_text_color?: string;
 }
 
+export interface TelegramCloudStorage {
+  setItem: (key: string, value: string, cb?: (err: string | null, ok?: boolean) => void) => void;
+  getItem: (key: string, cb: (err: string | null, value?: string) => void) => void;
+  removeItem: (key: string, cb?: (err: string | null, ok?: boolean) => void) => void;
+  getKeys: (cb: (err: string | null, keys?: string[]) => void) => void;
+}
+
+export type HapticImpactStyle = "light" | "medium" | "heavy" | "rigid" | "soft";
+export type HapticNotificationType = "error" | "success" | "warning";
+
+export interface TelegramHapticFeedback {
+  impactOccurred: (style: HapticImpactStyle) => void;
+  notificationOccurred: (type: HapticNotificationType) => void;
+  selectionChanged: () => void;
+}
+
 export interface TelegramWebApp {
   initData: string;
   initDataUnsafe: {
@@ -44,6 +60,9 @@ export interface TelegramWebApp {
   isExpanded: boolean;
   viewportHeight: number;
   viewportStableHeight: number;
+
+  CloudStorage?: TelegramCloudStorage;
+  HapticFeedback?: TelegramHapticFeedback;
 
   ready: () => void;
   expand: () => void;

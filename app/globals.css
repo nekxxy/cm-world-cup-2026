@@ -8,20 +8,23 @@
   --tg-button-text: #ffffff;
 
   /* --- Team theming (swapped at runtime by useTeamTheme) ----------------
-     Body text NEVER sits on --color-primary/secondary; those are accents and
-     headers only. --color-bg / --color-text are neutral paper + ink so any of
-     the 48 palettes stays legible. Defaults below = the neutral theme. */
-  --color-primary: #2b2b2b;
-  --color-secondary: #8a8a8a;
-  --color-on-primary: #fff8ec; /* legible text on primary */
-  --color-on-secondary: #1a1a1a; /* legible text on secondary */
-  --color-bg: #fff8ec; /* cream paper */
-  --color-text: #1a1a1a; /* charcoal ink */
+     Dark, modern palette. Body text NEVER sits on --color-primary/secondary;
+     those are filled accents + headers only. --color-accent is the team colour
+     lifted to stay legible as accent TEXT on the dark page. --color-bg /
+     --color-text stay a neutral dark paper + light ink so any of the 48
+     palettes stays legible. Defaults below = the neutral dark theme. */
+  --color-primary: #3a3d46;
+  --color-secondary: #6b7280;
+  --color-on-primary: #f2f3f5; /* legible text on a filled primary surface */
+  --color-on-secondary: #0e0f13; /* legible text on a filled secondary surface */
+  --color-accent: #c9ccd6; /* legible accent text on dark bg */
+  --color-bg: #0e0f13; /* dark paper */
+  --color-text: #f2f3f5; /* light ink */
 
-  /* Neutral panels that body content lives on, regardless of team. */
-  --color-panel: #ffffff;
-  --color-muted: #6b6b6b;
-  --color-hairline: rgba(26, 26, 26, 0.12);
+  /* Neutral raised panels that body content lives on, regardless of team. */
+  --color-panel: #1a1c22;
+  --color-muted: #9aa0aa;
+  --color-hairline: rgba(255, 255, 255, 0.1);
 
   /* Safe-area insets (Telegram fullscreen / notched devices). */
   --safe-top: env(safe-area-inset-top, 0px);
@@ -39,8 +42,15 @@ body {
 }
 
 body {
-  background: var(--tg-bg);
-  color: var(--tg-text);
+  /* Dark paper with a subtle team-tinted glow at the top for a modern feel. */
+  background: var(--color-bg);
+  background-image: radial-gradient(
+    120% 60% at 50% -10%,
+    color-mix(in srgb, var(--color-primary) 28%, transparent),
+    transparent 70%
+  );
+  background-attachment: fixed;
+  color: var(--color-text);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   /* Respect notches and the Telegram header/footer. */
@@ -76,9 +86,10 @@ body {
   padding: 16px 18px;
 }
 
-/* Accent treatments that are safe on the cream paper. */
+/* Accent treatments that are safe on the dark paper. Text uses the lifted
+   accent so near-black team colours don't vanish; bars use the raw brand. */
 .accent-text {
-  color: var(--color-primary);
+  color: var(--color-accent);
 }
 .accent-bar {
   background: var(--color-primary);

@@ -36,3 +36,30 @@ export function contrastRatio(a: string, b: string): number {
 export function onColor(bg: string): string {
   return contrastRatio(bg, CHARCOAL) >= contrastRatio(bg, CREAM) ? CHARCOAL : CREAM;
 }
+
+function toHex(n: number) {
+  return Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, "0");
+}
+
+/** Blend `hex` toward `target` (#fff or #000) by `amount` (0–1). */
+function mix(hex: string, target: string, amount: number): string {
+  const [r, g, b] = parseHex(hex);
+  const [tr, tg, tb] = parseHex(target);
+  return `#${toHex(r + (tr - r) * amount)}${toHex(g + (tg - g) * amount)}${toHex(b + (tb - b) * amount)}`;
+}
+
+/**
+ * Return a tone of `fg` that meets `ratio` against `bg`, lightening toward
+ * white on dark backgrounds (or darkening toward black on light ones). Used to
+ * keep a team's brand colour legible as accent TEXT on the dark UI — e.g. a
+ * near-black team colour gets lifted so it doesn't vanish on a charcoal page.
+ */
+export function ensureContrast(fg: string, bg: string, ratio = 4.5): string {
+  if (contrastRatio(fg, bg) >= ratio) return fg;
+  const target = luminance(bg) < 0.5 ? "#FFFFFF" : "#000000";
+  for (let amount = 0.1; amount <= 1; amount += 0.1) {
+    const candidate = mix(fg, target, amount);
+    if (contrastRatio(candidate, bg) >= ratio) return candidate;
+  }
+  return target;
+}
