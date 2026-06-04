@@ -1,267 +1,192 @@
-@import "tailwindcss";
-
-/* ───────────────────────────────────────────────────────────
-   Design tokens — "The Road to 2026": grounded, cinematic dusk.
-   Deep navy base, warm stadium-gold accent, emerald pitch, and
-   floodlight white. Accent vars stay runtime-swappable so match-day
-   mode can retint the whole UI to a team's colours.
-   ─────────────────────────────────────────────────────────── */
 :root {
-  /* Base surfaces — deep navy/black, like a stadium at dusk */
-  --bg: #070a12;
-  --bg-2: #0b0f1a;
-  --surface: rgba(255, 255, 255, 0.05);
-  --surface-2: rgba(255, 255, 255, 0.085);
-  --line: rgba(255, 255, 255, 0.1);
+  /* Telegram theme params are injected onto these at runtime later;
+     these are sensible defaults for browser previews. */
+  --tg-bg: #ffffff;
+  --tg-text: #111111;
+  --tg-hint: #707579;
+  --tg-button: #2ea6ff;
+  --tg-button-text: #ffffff;
 
-  /* Text — warm floodlight white */
-  --text: #f5f7fb;
-  --dim: #9aa6ba;
+  /* --- Team theming (swapped at runtime by useTeamTheme) ----------------
+     Dark, modern palette. Body text NEVER sits on --color-primary/secondary;
+     those are filled accents + headers only. --color-accent is the team colour
+     lifted to stay legible as accent TEXT on the dark page. --color-bg /
+     --color-text stay a neutral dark paper + light ink so any of the 48
+     palettes stays legible. Defaults below = the neutral dark theme. */
+  --color-primary: #3a3d46;
+  --color-secondary: #6b7280;
+  --color-on-primary: #f2f3f5; /* legible text on a filled primary surface */
+  --color-on-secondary: #0e0f13; /* legible text on a filled secondary surface */
+  --color-accent: #c9ccd6; /* legible accent text on dark bg */
+  --color-bg: #0e0f13; /* dark paper */
+  --color-text: #f2f3f5; /* light ink */
 
-  /* Accent — warm stadium gold (default brand). Swapped per favourite team. */
-  --accent: #e9b24c;
-  --accent-2: #2fbf71;
-  --accent-rgb: 233, 178, 76;
+  /* Neutral raised panels that body content lives on, regardless of team. */
+  --color-panel: #1a1c22;
+  --color-muted: #9aa0aa;
+  --color-hairline: rgba(255, 255, 255, 0.1);
 
-  /* Grounded palette */
-  --grass: #2fbf71;
-  --floodlight: #fff6e0;
-
-  /* Subtle nation hints (used sparingly, never as a flag collage) */
-  --usa: #5b7cff;
-  --can: #e5575c;
-  --mex: #2fbf71;
-
-  /* Status */
-  --live: #ff4d4d;
-  --warn: #ffc24b;
-  --gold: #e9b24c;
-
-  color-scheme: dark;
+  /* Safe-area insets (Telegram fullscreen / notched devices). */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* Map design tokens to Tailwind utilities. `inline` keeps the var
-   reference in the emitted utility so runtime overrides take effect. */
-@theme inline {
-  --color-bg: var(--bg);
-  --color-bg2: var(--bg-2);
-  --color-surface: var(--surface);
-  --color-surface2: var(--surface-2);
-  --color-line: var(--line);
-  --color-text: var(--text);
-  --color-dim: var(--dim);
-  --color-accent: var(--accent);
-  --color-accent2: var(--accent-2);
-  --color-grass: var(--grass);
-  --color-floodlight: var(--floodlight);
-  --color-live: var(--live);
-  --color-warn: var(--warn);
-  --color-gold: var(--gold);
-
-  --font-display: var(--font-anton), "Arial Narrow", system-ui, sans-serif;
-  --font-body: var(--font-hanken), system-ui, sans-serif;
-
-  --radius-xl2: 1.375rem;
+* {
+  box-sizing: border-box;
 }
 
-html {
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
-  scroll-behavior: smooth;
+html,
+body {
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  min-height: 100dvh;
-  overflow-x: hidden; /* contain the full-bleed hero (w-screen) on desktop */
-  color: var(--text);
-  font-family: var(--font-body);
-  /* Golden dusk sky overhead, emerald pitch-glow underfoot, over deep navy. */
-  background:
-    radial-gradient(1100px 620px at 50% -12%, rgba(233, 178, 76, 0.12), transparent 62%),
-    radial-gradient(1300px 760px at 50% 118%, rgba(47, 191, 113, 0.09), transparent 60%),
-    linear-gradient(180deg, #070a12 0%, #090d18 58%, #05070e 100%);
+  /* Dark paper with a subtle team-tinted glow at the top for a modern feel. */
+  background: var(--color-bg);
+  background-image: radial-gradient(
+    120% 60% at 50% -10%,
+    color-mix(in srgb, var(--color-primary) 28%, transparent),
+    transparent 70%
+  );
   background-attachment: fixed;
+  color: var(--color-text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+  /* Respect notches and the Telegram header/footer. */
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+  min-height: 100dvh;
 }
 
-/* Display face: tighten for that jersey-number, broadcast energy. */
-.font-display,
-[class*="font-display"] {
-  letter-spacing: 0.01em;
-}
-
-/* ── Reusable utilities ─────────────────────────────────────── */
-
-/* Glassy card that floats over the 3D canvas / space backdrop. */
-@utility glass {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  -webkit-backdrop-filter: blur(14px) saturate(1.2);
-  backdrop-filter: blur(14px) saturate(1.2);
-  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.04) inset,
-    0 24px 60px -28px rgba(0, 0, 0, 0.7);
-}
-
-@utility glass-2 {
-  background: var(--surface-2);
-  border: 1px solid var(--line);
-  -webkit-backdrop-filter: blur(14px) saturate(1.2);
-  backdrop-filter: blur(14px) saturate(1.2);
-}
-
-/* Warm floodlight→gold gradient for big impact words. */
-@utility text-grad {
-  background: linear-gradient(96deg, var(--floodlight) 0%, var(--accent) 115%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-@utility accent-glow {
-  box-shadow: 0 0 0 1px rgba(var(--accent-rgb), 0.4),
-    0 0 28px -4px rgba(var(--accent-rgb), 0.55);
-}
-
-/* Subtle film grain / atmospheric haze overlay (place over the hero). */
-@utility grain {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-}
-
-/* Stadium-light beacon pulse for DOM city markers. */
-@keyframes flood {
-  0%,
-  100% {
-    opacity: 0.55;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.12);
-  }
-}
-.beacon-pulse {
-  animation: flood 3.2s ease-in-out infinite;
-}
-
-/* Slow cinematic pan for hero/background imagery. */
-@keyframes kenburns {
-  from {
-    transform: scale(1.04) translateY(0);
-  }
-  to {
-    transform: scale(1.12) translateY(-1.5%);
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
   }
 }
 
-/* Safe-area helpers for notched phones. */
-@utility pb-safe {
-  padding-bottom: calc(env(safe-area-inset-bottom) + var(--pb, 0px));
-}
-@utility pt-safe {
-  padding-top: calc(env(safe-area-inset-top) + var(--pt, 0px));
+/* --- Themed building blocks ---------------------------------------------
+   Use these so team colour only ever lands where it's safe. */
+
+/* Team-coloured header bar. Text uses the computed legible on-colour. */
+.themed-header {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  padding: 16px 18px;
+  border-radius: 14px;
 }
 
-/* A cheap, GPU-light starfield (no image) for the landing. */
-@utility starfield {
-  background-image:
-    radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.7), transparent),
-    radial-gradient(1px 1px at 75% 18%, rgba(255, 255, 255, 0.55), transparent),
-    radial-gradient(1.5px 1.5px at 50% 60%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(1px 1px at 12% 80%, rgba(255, 255, 255, 0.45), transparent),
-    radial-gradient(1px 1px at 90% 70%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(1.5px 1.5px at 65% 88%, rgba(255, 255, 255, 0.4), transparent);
-  background-repeat: repeat;
-  background-size: 320px 320px;
+/* Neutral panel for body content — always cream/charcoal, never team colour. */
+.themed-panel {
+  background: var(--color-panel);
+  color: var(--color-text);
+  border: 1px solid var(--color-hairline);
+  border-radius: 14px;
+  padding: 16px 18px;
 }
 
-/* Custom scrollbar for the dark theme. */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+/* Accent treatments that are safe on the dark paper. Text uses the lifted
+   accent so near-black team colours don't vanish; bars use the raw brand. */
+.accent-text {
+  color: var(--color-accent);
 }
-*::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+.accent-bar {
+  background: var(--color-primary);
 }
-*::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.16);
-  border-radius: 9999px;
-}
-
-/* Hide scrollbar where we want clean horizontal scrollers. */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+.chip-secondary {
+  background: var(--color-secondary);
+  color: var(--color-on-secondary);
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 13px;
+  font-weight: 600;
 }
 
-/* Live pulse for in-progress matches. */
-@keyframes live-pulse {
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.45;
-    transform: scale(0.7);
-  }
+/* --- PlayerCard holographic foil ----------------------------------------
+   Tilt updates the custom props below (rx/ry rotation, glare + holo offset);
+   --foil (0–1) scales the whole holographic treatment by rarity. With no JS
+   updates (reduced-motion / no sensor) the defaults render a fixed sheen. */
+.pc-perspective {
+  perspective: 900px;
 }
-.live-dot {
-  animation: live-pulse 1.4s ease-in-out infinite;
-}
-
-/* Staggered entrance used by the HUD reveal. */
-@keyframes rise-in {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-.rise-in {
-  animation: rise-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-@keyframes shimmer {
-  100% {
-    transform: translateX(100%);
-  }
-}
-.skeleton {
+.pc-card {
+  --rx: 0deg;
+  --ry: 0deg;
+  --glare-x: 32%;
+  --glare-y: 22%;
+  --holo-x: 0px;
+  --holo-y: 0px;
+  --foil: 0;
   position: relative;
+  aspect-ratio: 3 / 4;
+  border-radius: 16px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--color-panel);
+  border: 1px solid var(--color-hairline);
+  transform: rotateX(var(--ry)) rotateY(var(--rx));
+  transform-style: preserve-3d;
+  will-change: transform;
 }
-.skeleton::after {
-  content: "";
+.pc-art {
   position: absolute;
   inset: 0;
-  transform: translateX(-100%);
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.07),
-    transparent
-  );
-  animation: shimmer 1.6s infinite;
+  display: grid;
+  place-items: center;
 }
-
-/* Respect users who prefer reduced motion. */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-    scroll-behavior: auto !important;
-  }
+/* rainbow holographic sweep */
+.pc-foil {
+  position: absolute;
+  inset: -20%;
+  background: repeating-linear-gradient(
+    115deg,
+    hsl(0 90% 65%) 0%,
+    hsl(50 95% 65%) 12%,
+    hsl(140 85% 60%) 24%,
+    hsl(190 90% 62%) 36%,
+    hsl(265 85% 68%) 48%,
+    hsl(320 90% 66%) 60%,
+    hsl(0 90% 65%) 72%
+  );
+  background-size: 220% 220%;
+  background-position: calc(50% + var(--holo-x)) calc(50% + var(--holo-y));
+  mix-blend-mode: color-dodge;
+  opacity: calc(var(--foil) * 0.45);
+  pointer-events: none;
+}
+/* moving specular glare */
+.pc-glare {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--glare-x) var(--glare-y),
+    rgba(255, 255, 255, 0.6),
+    rgba(255, 255, 255, 0) 45%
+  );
+  mix-blend-mode: screen;
+  opacity: calc(var(--foil) * 0.85);
+  pointer-events: none;
+}
+.pc-info {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 12px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+  color: #fff;
+  pointer-events: none;
+}
+.pc-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 900;
+  pointer-events: none;
 }

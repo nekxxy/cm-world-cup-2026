@@ -1,16 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  reactStrictMode: true,
+  // Telegram serves avatars from t.me; allow remote images.
   images: {
-    // API-Football serves team logos & flags from these hosts.
     remotePatterns: [
-      { protocol: "https", hostname: "media.api-sports.io" },
-      { protocol: "https", hostname: "flagcdn.com" },
+      { protocol: "https", hostname: "t.me" },
+      { protocol: "https", hostname: "**.telegram.org" },
     ],
   },
-  // three.js ships large source maps we don't need to trace.
-  productionBrowserSourceMaps: false,
 };
 
 export default nextConfig;
