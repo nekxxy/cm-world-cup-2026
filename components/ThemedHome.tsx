@@ -4,6 +4,7 @@
 import type { Team } from "@/data/teams";
 import type { TelegramUser } from "@/telegram/types";
 import TeamCrest from "./TeamCrest";
+import HeroBall from "@/scenes/HeroBall";
 
 export default function ThemedHome({
   team,
@@ -27,6 +28,8 @@ export default function ThemedHome({
           <h1 style={styles.teamName}>{team.name}</h1>
           <p style={styles.greeting}>Welcome aboard, {firstName} 🌍</p>
         </header>
+
+        <HeroBall primary={team.primary} secondary={team.secondary} />
 
         <section className="themed-panel" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           <h2 style={{ margin: 0, fontSize: 16 }}>
