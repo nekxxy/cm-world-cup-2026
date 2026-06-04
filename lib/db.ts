@@ -69,6 +69,84 @@ export function ensureSchema(): Promise<void> {
           sent_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
           PRIMARY KEY (fixture_id, kind)
         )`;
+
+      // --- Real WC2026 data (imported from the football API) ---------------
+      // Every row carries source + last_updated so nothing is unattributed.
+      await sql`
+        CREATE TABLE IF NOT EXISTS venues (
+          id           INT PRIMARY KEY,
+          name         TEXT,
+          city         TEXT,
+          country      TEXT,
+          image        TEXT,
+          source       TEXT,
+          last_updated TIMESTAMPTZ NOT NULL DEFAULT now()
+        )`;
+      await sql`
+        CREATE TABLE IF NOT EXISTS real_teams (
+          id           INT PRIMARY KEY,
+          name         TEXT NOT NULL,
+          code         TEXT,
+          country      TEXT,
+          logo         TEXT,
+          group_label  TEXT,
+          source       TEXT,
+          last_updated TIMESTAMPTZ NOT NULL DEFAULT now()
+        )`;
+      await sql`
+        CREATE TABLE IF NOT EXISTS real_fixtures (
+          id            INT PRIMARY KEY,
+          round         TEXT,
+          stage         TEXT,
+          home_team_id  INT,
+          away_team_id  INT,
+          home_name     TEXT,
+          away_name     TEXT,
+          home_logo     TEXT,
+          away_logo     TEXT,
+          venue_id      INT,
+          venue_name    TEXT,
+          city          TEXT,
+          country       TEXT,
+          kickoff       TIMESTAMPTZ,
+          status_short  TEXT,
+          status_long   TEXT,
+          goals_home    INT,
+          goals_away    INT,
+          source        TEXT,
+          last_updated  TIMESTAMPTZ NOT NULL DEFAULT now()
+        )`;
+      await sql`
+        CREATE TABLE IF NOT EXISTS real_players (
+          id            INT PRIMARY KEY,
+          name          TEXT NOT NULL,
+          team_id       INT,
+          position      TEXT,
+          number        INT,
+          age           INT,
+          photo         TEXT,
+          source        TEXT,
+          last_updated  TIMESTAMPTZ NOT NULL DEFAULT now()
+        )`;
+      // One row per dataset describing its freshness + provenance.
+      await sql`
+        CREATE TABLE IF NOT EXISTS data_sources (
+          key          TEXT PRIMARY KEY,
+          source       TEXT,
+          status       TEXT,
+          count        INT NOT NULL DEFAULT 0,
+          message      TEXT,
+          last_sync    TIMESTAMPTZ
+        )`;
+      await sql`
+        CREATE TABLE IF NOT EXISTS import_logs (
+          id          SERIAL PRIMARY KEY,
+          kind        TEXT NOT NULL,
+          status      TEXT NOT NULL,
+          count       INT NOT NULL DEFAULT 0,
+          message     TEXT,
+          created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+        )`;
     })().catch((e) => {
       schemaReady = null; // allow retry on next request
       throw e;
