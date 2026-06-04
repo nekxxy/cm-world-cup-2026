@@ -25,10 +25,12 @@ export default function ScrollExperience({
   team,
   user,
   onChangeTeam,
+  onOpenBuilder,
 }: {
   team: Team;
   user: TelegramUser | null;
   onChangeTeam: () => void;
+  onOpenBuilder: () => void;
 }) {
   const root = useRef<HTMLDivElement>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -107,6 +109,7 @@ export default function ScrollExperience({
             <span style={S.eyebrow}>GROUP {team.group} · YOUR ROAD TO GLORY</span>
           </div>
           <h1 style={S.heroTitle}>{team.name}</h1>
+          <button type="button" onClick={onOpenBuilder} style={S.cta}>Build your XI →</button>
         </div>
         <div className="hero-stage" style={{ width: "100%", maxWidth: 460 }}>
           <HeroBall primary={team.primary} secondary={team.secondary} />
@@ -228,7 +231,10 @@ export default function ScrollExperience({
         <p style={{ margin: "2px 0 16px", color: "var(--color-muted)" }}>
           Themed for <span className="accent-text" style={{ fontWeight: 700 }}>{team.name}</span>.
         </p>
-        <button type="button" onClick={onChangeTeam} style={S.changeBtn}>Change team</button>
+        <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+          <button type="button" onClick={onOpenBuilder} style={S.ctaSolid}>Build your XI</button>
+          <button type="button" onClick={onChangeTeam} style={S.changeBtn}>Change team</button>
+        </div>
         <p style={S.fine}>WC26 Fantasy · unofficial · for fun</p>
       </footer>
     </div>
@@ -251,6 +257,8 @@ const S: Record<string, React.CSSProperties> = {
   eyebrow: { fontSize: 12, letterSpacing: 1.5, fontWeight: 700, color: "var(--color-muted)" },
   heroTitle: { margin: 0, fontSize: 40, fontWeight: 900, lineHeight: 1, letterSpacing: -1 },
   scrollHint: { fontSize: 12, color: "var(--color-muted)", letterSpacing: 1 },
+  cta: { marginTop: 6, padding: "12px 22px", borderRadius: 999, background: "var(--color-primary)", color: "var(--color-on-primary)", border: "none", fontWeight: 800, fontSize: 15, cursor: "pointer" },
+  ctaSolid: { padding: "11px 20px", borderRadius: 999, background: "var(--color-primary)", color: "var(--color-on-primary)", border: "none", fontWeight: 800, fontSize: 14, cursor: "pointer" },
 
   section: { maxWidth: 480, margin: "0 auto", padding: "64px 16px" },
   kicker: { margin: 0, fontSize: 12, letterSpacing: 2, fontWeight: 700, color: "var(--color-accent)" },

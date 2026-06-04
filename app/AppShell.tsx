@@ -8,10 +8,11 @@ import { cloudGet, cloudSet } from "@/telegram/cloudStorage";
 import { hapticImpact, hapticSelection } from "@/telegram/haptics";
 import TeamSelector from "@/components/TeamSelector";
 import ScrollExperience from "@/components/experience/ScrollExperience";
+import TeamBuilder from "@/components/team/TeamBuilder";
 
 const TEAM_KEY = "wc26_team";
 
-type Phase = "loading" | "select" | "home";
+type Phase = "loading" | "select" | "home" | "build";
 
 export default function AppShell() {
   const { ready, user } = useTelegram();
@@ -19,7 +20,7 @@ export default function AppShell() {
   const [teamId, setTeamId] = useState<string | null>(null);
 
   // Re-theme the whole app whenever the pick changes (neutral while choosing).
-  useTeamTheme(phase === "home" ? teamId : null);
+  useTeamTheme(phase === "home" || phase === "build" ? teamId : null);
 
   // On launch, read the saved pick from CloudStorage and skip straight to home.
   useEffect(() => {
@@ -69,7 +70,18 @@ export default function AppShell() {
     return <TeamSelector currentTeamId={teamId} onSelect={handleSelect} />;
   }
 
-  return <ScrollExperience team={team} user={user} onChangeTeam={handleChangeTeam} />;
+  if (phase === "build") {
+    return <TeamBuilder team={team} onBack={() => setPhase("home")} />;
+  }
+
+  return (
+    <ScrollExperience
+      team={team}
+      user={user}
+      onChangeTeam={handleChangeTeam}
+      onOpenBuilder={() => { hapticImpact("light"); setPhase("build"); }}
+    />
+  );
 }
 
 const center: React.CSSProperties = {
