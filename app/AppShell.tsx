@@ -4,25 +4,28 @@ import { useEffect, useState } from "react";
 import { getTeam } from "@/data/teams";
 import { useTelegram } from "@/telegram/useTelegram";
 import { useTeamTheme } from "@/theme/useTeamTheme";
+import { useBackButton } from "@/telegram/useTelegramUI";
 import { cloudGet, cloudSet } from "@/telegram/cloudStorage";
 import { hapticImpact, hapticSelection } from "@/telegram/haptics";
 import TeamSelector from "@/components/TeamSelector";
 import ScrollExperience from "@/components/experience/ScrollExperience";
 import TeamBuilder from "@/components/team/TeamBuilder";
+import ProfileDashboard from "@/components/profile/ProfileDashboard";
+import BottomNav, { BOTTOM_NAV_HEIGHT, type Tab } from "@/components/nav/BottomNav";
+import EmptyState from "@/components/ui/EmptyState";
 
 const TEAM_KEY = "wc26_team";
 
-type Phase = "loading" | "select" | "home" | "build";
+type Phase = "loading" | "select" | "app";
 
 export default function AppShell() {
   const { ready, user } = useTelegram();
   const [phase, setPhase] = useState<Phase>("loading");
   const [teamId, setTeamId] = useState<string | null>(null);
+  const [tab, setTab] = useState<Tab>("home");
 
-  // Re-theme the whole app whenever the pick changes (neutral while choosing).
-  useTeamTheme(phase === "home" || phase === "build" ? teamId : null);
+  useTeamTheme(phase === "app" ? teamId : null);
 
-  // On launch, read the saved pick from CloudStorage and skip straight to home.
   useEffect(() => {
     if (!ready) return;
     let cancelled = false;
@@ -30,7 +33,7 @@ export default function AppShell() {
       if (cancelled) return;
       if (saved && getTeam(saved)) {
         setTeamId(saved);
-        setPhase("home");
+        setPhase("app");
       } else {
         setPhase("select");
       }
@@ -40,9 +43,16 @@ export default function AppShell() {
     };
   }, [ready]);
 
+  // Telegram BackButton returns to Home from any other tab.
+  useBackButton(phase === "app" && tab !== "home", () => {
+    hapticSelection();
+    setTab("home");
+  });
+
   const handleSelect = (id: string) => {
     setTeamId(id);
-    setPhase("home");
+    setPhase("app");
+    setTab("home");
     hapticImpact("medium");
     void cloudSet(TEAM_KEY, id);
   };
@@ -66,21 +76,51 @@ export default function AppShell() {
 
   const team = getTeam(teamId);
   if (!team) {
-    // Defensive: id somehow invalid — fall back to selection.
     return <TeamSelector currentTeamId={teamId} onSelect={handleSelect} />;
   }
 
-  if (phase === "build") {
-    return <TeamBuilder team={team} onBack={() => setPhase("home")} />;
-  }
-
   return (
-    <ScrollExperience
-      team={team}
-      user={user}
-      onChangeTeam={handleChangeTeam}
-      onOpenBuilder={() => { hapticImpact("light"); setPhase("build"); }}
-    />
+    <>
+      <div style={{ paddingBottom: `calc(${BOTTOM_NAV_HEIGHT}px + var(--safe-bottom) + 8px)` }}>
+        {tab === "home" && (
+          <ScrollExperience
+            team={team}
+            user={user}
+            onChangeTeam={handleChangeTeam}
+            onOpenBuilder={() => { hapticImpact("light"); setTab("xi"); }}
+          />
+        )}
+
+        {tab === "xi" && <TeamBuilder team={team} onBack={() => setTab("home")} />}
+
+        {tab === "fixtures" && (
+          <EmptyState
+            icon="📅"
+            title="Fixtures coming next"
+            message="All 104 real World Cup 2026 matches — with venues, host cities, and IST kickoff times — will appear here once the official data source is connected. No placeholder fixtures."
+          />
+        )}
+
+        {tab === "tasks" && (
+          <EmptyState
+            icon="⭐"
+            title="Tasks & rewards"
+            message="Complete in-app tasks to earn reminder credits, badges, and Pro perks. This screen is on the way."
+          />
+        )}
+
+        {tab === "profile" && (
+          <ProfileDashboard
+            team={team}
+            user={user}
+            onChangeTeam={handleChangeTeam}
+            onOpenBuilder={() => { hapticImpact("light"); setTab("xi"); }}
+          />
+        )}
+      </div>
+
+      <BottomNav active={tab} onChange={setTab} />
+    </>
   );
 }
 
