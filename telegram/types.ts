@@ -45,6 +45,20 @@ export interface TelegramHapticFeedback {
   selectionChanged: () => void;
 }
 
+export interface TelegramDeviceOrientation {
+  isStarted: boolean;
+  absolute: boolean;
+  /** Rotation around Z/X/Y axes, in radians. */
+  alpha: number;
+  beta: number;
+  gamma: number;
+  start: (
+    params: { refresh_rate?: number; need_absolute?: boolean },
+    cb?: (started: boolean) => void,
+  ) => void;
+  stop: (cb?: () => void) => void;
+}
+
 export interface TelegramWebApp {
   initData: string;
   initDataUnsafe: {
@@ -63,6 +77,7 @@ export interface TelegramWebApp {
 
   CloudStorage?: TelegramCloudStorage;
   HapticFeedback?: TelegramHapticFeedback;
+  DeviceOrientation?: TelegramDeviceOrientation;
 
   ready: () => void;
   expand: () => void;

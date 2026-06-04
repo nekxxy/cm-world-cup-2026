@@ -8,8 +8,16 @@ import type { TelegramUser } from "@/telegram/types";
 import { teamsInGroup, groupFixtures } from "@/data/fixtures";
 import { useSmoothScroll } from "@/scenes/scroll/useSmoothScroll";
 import TeamCrest from "@/components/TeamCrest";
+import PlayerCard, { type Player } from "@/components/PlayerCard";
 import HeroBall from "@/scenes/HeroBall";
 import Trophy from "@/scenes/Trophy";
+
+// Placeholder squad until real rosters + risograph art are supplied.
+const SAMPLE_SQUAD: Player[] = [
+  { name: "The Captain", position: "MF", number: 10, rarity: "captain" },
+  { name: "The Star", position: "FW", number: 9, rarity: "star" },
+  { name: "The Keeper", position: "GK", number: 1, rarity: "regular" },
+];
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -163,6 +171,20 @@ export default function ScrollExperience({
         </div>
       </section>
 
+      {/* SQUAD (holographic foil cards) */}
+      <section style={S.section}>
+        <p className="reveal-item" style={S.kicker}>YOUR SQUAD</p>
+        <h3 className="reveal-item" style={S.h3}>Collect the foil</h3>
+        <p className="reveal-item" style={{ ...S.lede, marginBottom: 18 }}>
+          Tilt your phone — star &amp; captain cards catch the light. Regulars stay matte.
+        </p>
+        <div className="reveal-item" style={S.cardRow}>
+          {SAMPLE_SQUAD.map((p) => (
+            <PlayerCard key={p.number} player={p} team={team} />
+          ))}
+        </div>
+      </section>
+
       {/* FIXTURES */}
       <section style={S.section}>
         <p className="reveal-item" style={S.kicker}>GROUP STAGE</p>
@@ -236,6 +258,7 @@ const S: Record<string, React.CSSProperties> = {
   h3: { margin: "6px 0 16px", fontSize: 26, fontWeight: 800 },
   lede: { margin: "12px 0 0", fontSize: 16, lineHeight: 1.5, color: "var(--color-muted)" },
 
+  cardRow: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 },
   chipRow: { display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 18 },
   statGrid: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 },
   stat: { textAlign: "center", padding: "14px 8px" },
