@@ -11,7 +11,7 @@ import TeamCrest from "@/components/TeamCrest";
 import NotifyButton from "@/components/NotifyButton";
 import PlayerCard, { type Player as CardPlayer } from "@/components/PlayerCard";
 import { PLAYERS } from "@/data/players";
-import HeroBall from "@/scenes/HeroBall";
+import HeroHub from "@/scenes/HeroHub";
 import Trophy from "@/scenes/Trophy";
 
 // Build a sample of three of the team's real players for the foil cards.
@@ -110,18 +110,16 @@ export default function ScrollExperience({
 
   return (
     <div ref={root}>
-      {/* HERO (pinned, 3D peak) */}
+      {/* HERO (pinned, 3D matchday hub) */}
       <section className="hero-section" style={S.hero}>
         <div className="hero-copy" style={S.col}>
           <div style={S.eyebrowRow}>
             <TeamCrest team={team} size={26} />
-            <span style={S.eyebrow}>GROUP {team.group} · YOUR ROAD TO GLORY</span>
+            <span style={S.eyebrow}>GROUP {team.group} · {team.name.toUpperCase()}</span>
           </div>
-          <h1 style={S.heroTitle}>{team.name}</h1>
-          <button type="button" onClick={onOpenBuilder} style={S.cta}>Build your XI →</button>
         </div>
         <div className="hero-stage" style={{ width: "100%", maxWidth: 460 }}>
-          <HeroBall primary={team.primary} secondary={team.secondary} />
+          <HeroHub team={team} onOpenBuilder={onOpenBuilder} />
         </div>
         <span style={S.scrollHint}>scroll ↓</span>
       </section>

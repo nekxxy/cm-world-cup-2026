@@ -70,3 +70,13 @@ function knockoutMatches(): ScheduleMatch[] {
 }
 
 export const SCHEDULE: ScheduleMatch[] = [...groupMatches(), ...knockoutMatches()];
+
+/** The soonest match whose kickoff is still in the future. */
+export function nextFixture(now: Date = new Date()): ScheduleMatch | null {
+  const t = now.getTime();
+  return (
+    SCHEDULE.filter((m) => new Date(m.kickoff).getTime() > t).sort(
+      (a, b) => new Date(a.kickoff).getTime() - new Date(b.kickoff).getTime(),
+    )[0] ?? null
+  );
+}
