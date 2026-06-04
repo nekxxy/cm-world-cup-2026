@@ -13,6 +13,7 @@ import TeamBuilder from "@/components/team/TeamBuilder";
 import ProfileDashboard from "@/components/profile/ProfileDashboard";
 import BottomNav, { BOTTOM_NAV_HEIGHT, type Tab } from "@/components/nav/BottomNav";
 import EmptyState from "@/components/ui/EmptyState";
+import FixturesScreen from "@/components/fixtures/FixturesScreen";
 
 const TEAM_KEY = "wc26_team";
 
@@ -93,13 +94,7 @@ export default function AppShell() {
 
         {tab === "xi" && <TeamBuilder team={team} onBack={() => setTab("home")} />}
 
-        {tab === "fixtures" && (
-          <EmptyState
-            icon="📅"
-            title="Fixtures coming next"
-            message="All 104 real World Cup 2026 matches — with venues, host cities, and IST kickoff times — will appear here once the official data source is connected. No placeholder fixtures."
-          />
-        )}
+        {tab === "fixtures" && <FixturesScreen />}
 
         {tab === "tasks" && (
           <EmptyState
