@@ -8,16 +8,25 @@ import type { TelegramUser } from "@/telegram/types";
 import { teamsInGroup, groupFixtures } from "@/data/fixtures";
 import { useSmoothScroll } from "@/scenes/scroll/useSmoothScroll";
 import TeamCrest from "@/components/TeamCrest";
-import PlayerCard, { type Player } from "@/components/PlayerCard";
+import NotifyButton from "@/components/NotifyButton";
+import PlayerCard, { type Player as CardPlayer } from "@/components/PlayerCard";
+import { PLAYERS } from "@/data/players";
 import HeroBall from "@/scenes/HeroBall";
 import Trophy from "@/scenes/Trophy";
 
-// Placeholder squad until real rosters + risograph art are supplied.
-const SAMPLE_SQUAD: Player[] = [
-  { name: "The Captain", position: "MF", number: 10, rarity: "captain" },
-  { name: "The Star", position: "FW", number: 9, rarity: "star" },
-  { name: "The Keeper", position: "GK", number: 1, rarity: "regular" },
-];
+// Build a sample of three of the team's real players for the foil cards.
+function sampleSquad(teamId: string): CardPlayer[] {
+  const squad = PLAYERS.filter((p) => p.teamId === teamId);
+  const pick = (pos: string) => squad.find((p) => p.position === pos);
+  const fwd = pick("FWD");
+  const mid = pick("MID");
+  const gk = pick("GK");
+  return [
+    { name: fwd?.name ?? "Striker", position: "FWD", number: 9, rarity: "captain" },
+    { name: mid?.name ?? "Playmaker", position: "MID", number: 10, rarity: "star" },
+    { name: gk?.name ?? "Keeper", position: "GK", number: 1, rarity: "regular" },
+  ];
+}
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -182,7 +191,7 @@ export default function ScrollExperience({
           Tilt your phone — star &amp; captain cards catch the light. Regulars stay matte.
         </p>
         <div className="reveal-item" style={S.cardRow}>
-          {SAMPLE_SQUAD.map((p) => (
+          {sampleSquad(team.id).map((p) => (
             <PlayerCard key={p.number} player={p} team={team} />
           ))}
         </div>
@@ -233,6 +242,7 @@ export default function ScrollExperience({
         </p>
         <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
           <button type="button" onClick={onOpenBuilder} style={S.ctaSolid}>Build your XI</button>
+          <NotifyButton />
           <button type="button" onClick={onChangeTeam} style={S.changeBtn}>Change team</button>
         </div>
         <p style={S.fine}>WC26 Fantasy · unofficial · for fun</p>

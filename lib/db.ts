@@ -59,6 +59,16 @@ export function ensureSchema(): Promise<void> {
           prev_rank  INT,
           PRIMARY KEY (user_id, round)
         )`;
+      // Whether the user granted the bot write access (for reminders).
+      await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS allows_write BOOLEAN NOT NULL DEFAULT false`;
+      // Idempotency ledger: one row per (fixture/event, kind) we've notified for.
+      await sql`
+        CREATE TABLE IF NOT EXISTS notifications_sent (
+          fixture_id  TEXT NOT NULL,
+          kind        TEXT NOT NULL,
+          sent_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+          PRIMARY KEY (fixture_id, kind)
+        )`;
     })().catch((e) => {
       schemaReady = null; // allow retry on next request
       throw e;

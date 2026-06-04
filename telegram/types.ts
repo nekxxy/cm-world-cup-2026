@@ -81,6 +81,7 @@ export interface TelegramWebApp {
 
   ready: () => void;
   expand: () => void;
+  requestWriteAccess?: (cb?: (granted: boolean) => void) => void;
   isVersionAtLeast: (version: string) => boolean;
   onEvent: (eventType: string, handler: () => void) => void;
   offEvent: (eventType: string, handler: () => void) => void;

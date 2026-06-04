@@ -3,6 +3,7 @@
 // survive. Each team contributes a small squad across the four positions.
 
 import { TEAMS, type Team } from "./teams";
+import { REAL_SQUADS } from "./realSquads";
 
 export type Position = "GK" | "DEF" | "MID" | "FWD";
 
@@ -36,6 +37,7 @@ function seed(str: string): number {
 
 function buildTeamSquad(team: Team): Player[] {
   const out: Player[] = [];
+  const real = REAL_SQUADS[team.id];
   for (const { pos, count, band } of SHAPE) {
     for (let i = 1; i <= count; i++) {
       const id = `${team.id}-${pos}${i}`;
@@ -43,14 +45,9 @@ function buildTeamSquad(team: Team): Player[] {
       // Best player of each position (i === 1) skews toward the top of the band.
       const skew = i === 1 ? 0.75 + r * 0.25 : r;
       const credits = Math.round((band[0] + (band[1] - band[0]) * skew) * 2) / 2; // .0 / .5
-      out.push({
-        id,
-        name: `${team.code} ${pos}${i}`,
-        teamId: team.id,
-        teamCode: team.code,
-        position: pos,
-        credits,
-      });
+      // Real name when curated, else a generated placeholder.
+      const name = real?.[pos]?.[i - 1] ?? `${team.code} ${pos}${i}`;
+      out.push({ id, name, teamId: team.id, teamCode: team.code, position: pos, credits });
     }
   }
   return out;
