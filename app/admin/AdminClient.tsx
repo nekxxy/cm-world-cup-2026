@@ -61,6 +61,16 @@ export default function AdminClient() {
     setBusy(false);
   }
 
+  async function importWorldCup() {
+    setBusy(true);
+    say("Importing from WorldCupUndo…");
+    const r = await fetch("/api/admin/import/worldcup", { method: "POST", headers: headers() });
+    const d = await r.json().catch(() => ({}));
+    say(`worldcupundo → ${r.status} ${JSON.stringify(d)}`);
+    await refresh();
+    setBusy(false);
+  }
+
   return (
     <main style={S.wrap}>
       <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>WC26 Admin</h1>
@@ -81,6 +91,9 @@ export default function AdminClient() {
         <button onClick={importTeams} disabled={!secret || busy} style={S.btn}>Import teams</button>
         <button onClick={importFixtures} disabled={!secret || busy} style={S.btn}>Import fixtures</button>
         <button onClick={importSquads} disabled={!secret || busy} style={S.btn}>Import squads</button>
+        <button onClick={importWorldCup} disabled={!secret || busy} style={{ ...S.btn, background: "var(--color-secondary)", color: "var(--color-on-secondary)" }}>
+          Import WorldCupUndo
+        </button>
       </div>
 
       {status && (
