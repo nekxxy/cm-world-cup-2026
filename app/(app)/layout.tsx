@@ -1,4 +1,4 @@
-import BottomNav from "@/components/nav/BottomNav";
+import CinematicNav from "@/components/nav/CinematicNav";
 
 export default function AppLayout({
   children,
@@ -7,10 +7,10 @@ export default function AppLayout({
 }) {
   return (
     <>
-      <main className="relative mx-auto w-full max-w-[640px] px-4 pt-safe [--pt:1.25rem] pb-[128px]">
+      <CinematicNav />
+      <main className="relative mx-auto w-full max-w-[680px] px-4 pb-20 pt-[calc(env(safe-area-inset-top)+5.25rem)]">
         {children}
       </main>
-      <BottomNav />
     </>
   );
 }
