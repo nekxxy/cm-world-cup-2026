@@ -147,6 +147,21 @@ export function ensureSchema(): Promise<void> {
           message     TEXT,
           created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
         )`;
+      // Extra real-data columns (ESPN/WorldCupUndo shape): brand colours, IST
+      // strings the source pre-computes, and per-fixture team metadata.
+      await sql`ALTER TABLE real_teams ADD COLUMN IF NOT EXISTS short_name TEXT`;
+      await sql`ALTER TABLE real_teams ADD COLUMN IF NOT EXISTS color TEXT`;
+      await sql`ALTER TABLE real_teams ADD COLUMN IF NOT EXISTS alternate_color TEXT`;
+      await sql`ALTER TABLE real_fixtures ADD COLUMN IF NOT EXISTS home_short TEXT`;
+      await sql`ALTER TABLE real_fixtures ADD COLUMN IF NOT EXISTS away_short TEXT`;
+      await sql`ALTER TABLE real_fixtures ADD COLUMN IF NOT EXISTS home_color TEXT`;
+      await sql`ALTER TABLE real_fixtures ADD COLUMN IF NOT EXISTS away_color TEXT`;
+      await sql`ALTER TABLE real_fixtures ADD COLUMN IF NOT EXISTS ist_date TEXT`;
+      await sql`ALTER TABLE real_fixtures ADD COLUMN IF NOT EXISTS ist_time TEXT`;
+      await sql`ALTER TABLE real_fixtures ADD COLUMN IF NOT EXISTS ist_day_key TEXT`;
+      await sql`ALTER TABLE real_fixtures ADD COLUMN IF NOT EXISTS venue_country TEXT`;
+      await sql`ALTER TABLE real_fixtures ADD COLUMN IF NOT EXISTS is_live BOOLEAN`;
+      await sql`ALTER TABLE real_fixtures ADD COLUMN IF NOT EXISTS is_finished BOOLEAN`;
     })().catch((e) => {
       schemaReady = null; // allow retry on next request
       throw e;
