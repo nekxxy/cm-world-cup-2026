@@ -40,8 +40,8 @@ export default function Trophy({
       style={{
         position: "relative",
         width: "100%",
-        height: 320,
-        maxWidth: 360,
+        height: "min(72svh, 560px)",
+        maxWidth: 460,
       }}
     >
       <HeroPoster primary={primary} secondary={secondary} />
